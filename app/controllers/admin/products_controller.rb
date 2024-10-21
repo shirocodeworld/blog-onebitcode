@@ -25,7 +25,7 @@ class Admin::ProductsController < AdminController
 
     respond_to do |format|
       if @admin_product.save
-        format.html { redirect_to @admin_product, notice: "Product was successfully created." }
+        format.html { redirect_to admin_products_path(@admin_product), notice: "Product was successfully created." }
         format.json { render :show, status: :created, location: @admin_product }
       else
         format.html { render :new, status: :unprocessable_entity }
