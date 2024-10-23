@@ -2,14 +2,14 @@ class AdminController < ApplicationController
   layout "admin"
   before_action :authenticate_admin!
   def index
-    @orders = Order.where(fulfilled: false).order(created_at: :desc).take(5)
+    @orders = Order.where(fullfiled: false).order(created_at: :desc).take(5)
     @stats_quick = {
-      sales: Order.where(created_at: Time.now.midgnight..Time.now).count,
-      revenue: Order.where(created_at: Time.now.midgnight..Time.now).sum(:total).round(),
-      avg_sale: Order.where(created_at: Time.now.midgnight..Time.now).average(:total).round(),
+      sales: Order.where(created_at: Time.now.midnight..Time.now).count,
+      revenue: Order.where(created_at: Time.now.midnight..Time.now).sum(:total)&.round() || 0,
+      avg_sale: Order.where(created_at: Time.now.midnight..Time.now).average(:total)&.round() || 0,
       per_sale: OrderProduct.joins(:order).where(
         orders:{
-          created_at: Time.now.midgnight..Time.now
+          created_at: Time.now.midnight..Time.now
         }
       ).average(:quantity)
     }
@@ -20,7 +20,7 @@ class AdminController < ApplicationController
     @revenue_by_day = @orders_by_day.map {|day, orders| [day.strftime("%A"), orders.sum(&:total)]}
 
     if @revenue_by_day.count < 7
-      day_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+      days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
       data_hash = @revenue_by_day.to_h
       current_day = Date.today.strftime("%A")
       current_day_index = days_of_week.index(current_day)
